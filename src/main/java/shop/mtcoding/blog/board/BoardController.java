@@ -17,28 +17,25 @@ import java.util.List;
 @RequiredArgsConstructor // final이 붙은 친구들의 생성자를 만들어줘
 @Controller // new BoardController(IoC에서 BoardRepository를 찾아서 주입) -> IoC 컨테이너 등록
 public class BoardController {
-
+    private final BoardJPARepository boardJPARepo;
+    private final BoardService boardService;
     private final BoardRepository boardRepository;
     private final HttpSession session;
 
     @PostMapping("/board/save")
-    public String save(BoardRequest.SaveDTO reqDTO) {
+    public String write(BoardRequest.SaveDTO reqDTO) {
         User sessionUser = (User) session.getAttribute("sessionUser");
-        boardRepository.save(reqDTO.toEntity(sessionUser));
+        boardService.write(reqDTO,sessionUser);
+
         return "redirect:/";
     }
 
     @PostMapping("/board/{id}/update")
-    public String update(@PathVariable Integer id, BoardRequest.UpdateDTO reqDTO) {
+    public String update(@PathVariable Integer id,BoardRequest.UpdateDTO reqDTO) {
         User sessionUser = (User) session.getAttribute("sessionUser");
-        Board board = boardRepository.findById(id);
+        boardService.update(id,sessionUser.getId(),reqDTO);
 
-        if(sessionUser.getId() != board.getUser().getId()){
-            throw new Exception403("게시글을 수정할 권한이 없습니다");
-        }
-
-        boardRepository.updateById(id, reqDTO.getTitle(), reqDTO.getContent());
-        return "redirect:/board/" + id;
+        return "redirect:/board/"+id;
     }
 
     @GetMapping("/board/{id}/update-form")
@@ -64,7 +61,7 @@ public class BoardController {
 
     @GetMapping("/")
     public String index(HttpServletRequest request) {
-        List<Board> boardList = boardRepository.findAll();
+        List<Board> boardList = boardService.findAll();
         request.setAttribute("boardList", boardList);
         return "index";
     }
