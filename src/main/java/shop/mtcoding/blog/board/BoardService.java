@@ -68,8 +68,14 @@ public class BoardService {
     public BoardResponse.Detail detail(Integer boardId,User sessionUser){
         // 1 권한
         Board board = boardJPARepo.findByBoardId(boardId);
-
         return new BoardResponse.Detail(board,sessionUser);
 
+    }
+
+    // 게시글 업데이트폼
+    public Board updateForm(Integer boardId){
+        Board board = boardJPARepo.findByBoardId(boardId);
+
+        return  board;
     }
 }

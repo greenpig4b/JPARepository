@@ -40,8 +40,7 @@ public class BoardController {
 
     @GetMapping("/board/{id}/update-form")
     public String updateForm(@PathVariable Integer id, HttpServletRequest request) {
-        Board board = boardRepository.findById(id);
-
+        Board board = boardService.updateForm(id);
         request.setAttribute("board", board);
         return "board/update-form";
     }
@@ -70,7 +69,6 @@ public class BoardController {
     public String detail(@PathVariable Integer id, HttpServletRequest request) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         BoardResponse.Detail respDTO = boardService.detail(id,sessionUser);
-
         request.setAttribute("board", respDTO);
         return "board/detail";
     }
