@@ -16,7 +16,6 @@ import shop.mtcoding.blog._core.errors.exception.Exception401;
 @RequiredArgsConstructor
 @Controller
 public class UserController {
-    private final UserJPARepository userJPARepo;
     private final UserService userService;
     private final UserRepository userRepository;
     private final HttpSession session;
@@ -61,8 +60,8 @@ public class UserController {
     @GetMapping("/user/update-form")
     public String updateForm(HttpServletRequest request) {
         User sessionUser = (User) session.getAttribute("sessionUser");
+        User user = userService.updateForm(sessionUser.getId());
 
-        User user = userRepository.findById(sessionUser.getId());
         request.setAttribute("user", user);
         return "user/update-form";
     }

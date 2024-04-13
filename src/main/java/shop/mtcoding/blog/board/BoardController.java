@@ -17,9 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor // final이 붙은 친구들의 생성자를 만들어줘
 @Controller // new BoardController(IoC에서 BoardRepository를 찾아서 주입) -> IoC 컨테이너 등록
 public class BoardController {
-    private final BoardJPARepository boardJPARepo;
     private final BoardService boardService;
-    private final BoardRepository boardRepository;
     private final HttpSession session;
 
     @PostMapping("/board/save")
@@ -42,6 +40,7 @@ public class BoardController {
     public String updateForm(@PathVariable Integer id, HttpServletRequest request) {
         Board board = boardService.updateForm(id);
         request.setAttribute("board", board);
+
         return "board/update-form";
     }
 
@@ -57,11 +56,13 @@ public class BoardController {
     public String index(HttpServletRequest request) {
         List<Board> boardList = boardService.findAll();
         request.setAttribute("boardList", boardList);
+
         return "index";
     }
 
     @GetMapping("/board/save-form")
     public String saveForm() {
+
         return "board/save-form";
     }
 
@@ -70,6 +71,7 @@ public class BoardController {
         User sessionUser = (User) session.getAttribute("sessionUser");
         BoardResponse.Detail respDTO = boardService.detail(id,sessionUser);
         request.setAttribute("board", respDTO);
+
         return "board/detail";
     }
 }
