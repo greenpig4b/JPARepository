@@ -63,4 +63,13 @@ public class BoardService {
         //3 삭제
         boardJPARepo.deleteById(boardId);
     }
+
+    // 게시글 상세보기
+    public BoardResponse.Detail detail(Integer boardId,User sessionUser){
+        // 1 권한
+        Board board = boardJPARepo.findByBoardId(boardId);
+
+        return new BoardResponse.Detail(board,sessionUser);
+
+    }
 }

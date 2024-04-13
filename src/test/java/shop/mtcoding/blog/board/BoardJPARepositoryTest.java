@@ -15,7 +15,7 @@ public class BoardJPARepositoryTest {
 
 
     @Test
-    public void findAll(){
+    public void findAll_test(){
         //given
 
         //when
@@ -25,4 +25,14 @@ public class BoardJPARepositoryTest {
         Assertions.assertThat(boardList.get(0).getContent()).isEqualTo("내용4");
     }
 
+    @Test
+    public void findByBoardId_test(){
+        //given
+        Integer boardId = 1;
+        //when
+        Board board = boardJPARepo.findByBoardId(boardId);
+        //then
+        System.out.println(board.getUser().getUsername());
+        Assertions.assertThat(board.getUser().getUsername()).isEqualTo("ssar");
+    }
 }

@@ -69,18 +69,9 @@ public class BoardController {
     @GetMapping("/board/{id}")
     public String detail(@PathVariable Integer id, HttpServletRequest request) {
         User sessionUser = (User) session.getAttribute("sessionUser");
-        Board board = boardRepository.findByIdJoinUser(id);
+        BoardResponse.Detail respDTO = boardService.detail(id,sessionUser);
 
-        // 로그인을 하고, 게시글의 주인이면 isOwner가 true가 된다.
-        boolean isOwner = false;
-        if(sessionUser != null){
-            if(sessionUser.getId() == board.getUser().getId()){
-                isOwner = true;
-            }
-        }
-
-        request.setAttribute("isOwner", isOwner);
-        request.setAttribute("board", board);
+        request.setAttribute("board", respDTO);
         return "board/detail";
     }
 }
