@@ -3,6 +3,7 @@ package shop.mtcoding.blog.board;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import shop.mtcoding.blog._core.errors.exception.Exception401;
 import shop.mtcoding.blog._core.errors.exception.Exception403;
 import shop.mtcoding.blog._core.errors.exception.Exception404;
 import shop.mtcoding.blog.user.User;
@@ -44,5 +45,22 @@ public class BoardService {
         List<Board> boardList = boardJPARepo.findAll();
 
         return boardList;
+    }
+
+    //게시글 삭제
+    public void delete(Integer boardId, Integer sessionUserId){
+        // 1 인증
+        if(sessionUserId == null){
+            throw new Exception401("로그인이 필요한 서비스입니다");
+        }
+        // 2 권한
+        Board board = boardJPARepo.findById(boardId)
+                .orElseThrow(() -> new Exception404("해당 게시글을 찾을 수 없습니다"));
+
+        if (sessionUserId != board.getUser().getId()){
+            throw  new Exception403("삭제할 권한이 없습니다");
+        }
+        //3 삭제
+        boardJPARepo.deleteById(boardId);
     }
 }
