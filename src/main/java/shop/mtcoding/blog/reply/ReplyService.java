@@ -26,7 +26,7 @@ public class ReplyService {
                 .orElseThrow(() -> new Exception404("해당 게시글을 찾을 수 없습니다."));
 
         // 작성
-        Reply reply = reqDTO.toEntity(board,sessionUser);
+        Reply reply = reqDTO.toEntity(board, sessionUser);
 
         Reply saveBoard = replyJPARepo.save(reply);
 

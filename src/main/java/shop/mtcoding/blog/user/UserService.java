@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import shop.mtcoding.blog._core.errors.exception.Exception401;
 import shop.mtcoding.blog._core.errors.exception.Exception403;
 import shop.mtcoding.blog._core.errors.exception.Exception404;
+import shop.mtcoding.blog._core.util.JwtUtil;
 import shop.mtcoding.blog.board.Board;
 
 @RequiredArgsConstructor
@@ -24,18 +25,21 @@ public class UserService {
 
     //로그인
     @Transactional
-    public User login(UserRequest.LoginDTO reqDTO){
+    public String login(UserRequest.LoginDTO reqDTO){
         // 1 아이디체크
         User sessionUser = userJPARepo.findByIdAndPassword(reqDTO.getUsername(),reqDTO.getPassword())
                 .orElseThrow(() -> new Exception404("아이디 및 비밀번호가 일치하지않습니다."));
 
-        return sessionUser;
+        String jwt = JwtUtil.create(sessionUser);
+
+        return jwt;
     }
 
     //회원수정 폼
     public User updateForm(Integer userId){
         User sessionUser =  userJPARepo.findById(userId)
                 .orElseThrow(() -> new Exception404("해당정보를 찾을 수 없습니다."));
+
 
         return sessionUser;
     }
@@ -49,5 +53,12 @@ public class UserService {
         user.updateUser(reqDTO);
 
         return new UserResponse.userUpdate(user);
+    }
+
+    public User findById(Integer sessionUser){
+        User user = userJPARepo.findById(sessionUser)
+                .orElseThrow(() -> new Exception404("해당 유저가없습니다"));
+
+        return user;
     }
 }

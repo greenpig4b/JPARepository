@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import shop.mtcoding.blog._core.errors.exception.Exception403;
 import shop.mtcoding.blog._core.errors.exception.Exception404;
 import shop.mtcoding.blog._core.util.ApiUtil;
+import shop.mtcoding.blog.user.SessionUser;
 import shop.mtcoding.blog.user.User;
+import shop.mtcoding.blog.user.UserService;
 
 import java.util.List;
 
@@ -19,18 +21,19 @@ import java.util.List;
 public class BoardController {
     private final BoardService boardService;
     private final HttpSession session;
-
+    private final UserService userService;
     @PostMapping("/api/board")
     public ResponseEntity<?> write(@RequestBody BoardRequest.SaveDTO reqDTO) {
-        User sessionUser = (User) session.getAttribute("sessionUser");
-        BoardResponse.Save respDTO =  boardService.write(reqDTO,sessionUser);
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
+
+        BoardResponse.Save respDTO =  boardService.write(reqDTO, sessionUser);
 
         return ResponseEntity.ok().body(new ApiUtil<>(respDTO));
     }
 
     @PutMapping("/api/{id}/board")
     public ResponseEntity<?> update(@PathVariable Integer id,@RequestBody BoardRequest.UpdateDTO reqDTO) {
-        User sessionUser = (User) session.getAttribute("sessionUser");
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
         BoardResponse.Update respDTO = boardService.update(id,sessionUser.getId(),reqDTO);
 
         return ResponseEntity.ok().body(new ApiUtil<>(respDTO));
@@ -47,7 +50,7 @@ public class BoardController {
 
     @DeleteMapping("/api/board/{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id) {
-        User sessionUser = (User) session.getAttribute("sessionUser");
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
 
         boardService.delete(id,sessionUser.getId());
 
@@ -65,7 +68,7 @@ public class BoardController {
 
     @GetMapping("/api/boards/{id}")
     public ResponseEntity<?> detail(@PathVariable Integer id) {
-        User sessionUser = (User) session.getAttribute("sessionUser");
+        SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
         BoardResponse.Detail respDTO = boardService.detail(id,sessionUser);
 
        return  ResponseEntity.ok()

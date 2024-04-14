@@ -35,10 +35,11 @@ public class UserController {
     //로그인
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserRequest.LoginDTO reqDTO) {
-        User sessionUser = userService.login(reqDTO);
-        session.setAttribute("sessionUser",sessionUser);
+
+        String jwt = userService.login(reqDTO);
 
         return  ResponseEntity.ok()
+                .header("Authorization", "Bearer " + jwt)
                 .body(new ApiUtil<>(null));
     }
 
@@ -55,7 +56,7 @@ public class UserController {
     @PutMapping("/api/update")
     public ResponseEntity<?> update(@RequestBody UserRequest.UpdateDTO reqDTO) {
         User sessionUser = (User) session.getAttribute("sessionUser");
-        UserResponse.userUpdate respDTO = userService.update(sessionUser.getId(),reqDTO);
+        UserResponse.userUpdate respDTO = userService.update(sessionUser.getId(), reqDTO);
 
        return ResponseEntity.ok()
                .body(new ApiUtil<>(respDTO));
