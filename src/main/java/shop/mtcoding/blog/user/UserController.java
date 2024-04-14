@@ -9,6 +9,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import shop.mtcoding.blog._core.errors.exception.Exception400;
 import shop.mtcoding.blog._core.errors.exception.Exception401;
@@ -23,7 +24,7 @@ public class UserController {
 
     //회원가입
     @PostMapping("/join")
-    public ResponseEntity<?> join(@RequestBody UserRequest.JoinDTO reqDTO) {
+    public ResponseEntity<?> join(@Valid @RequestBody UserRequest.JoinDTO reqDTO, Errors erros) {
         User sessionUser = userService.join(reqDTO);
         session.setAttribute("sessionUser",sessionUser);
 
