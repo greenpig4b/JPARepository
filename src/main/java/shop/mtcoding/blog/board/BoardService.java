@@ -21,9 +21,10 @@ public class BoardService {
 
     //글쓰기
     @Transactional
-    public Board write(BoardRequest.SaveDTO reqDTO, User sessionUser){
+    public BoardResponse.Save write(BoardRequest.SaveDTO reqDTO, User sessionUser){
+        Board board = boardJPARepo.save(reqDTO.toEntity(sessionUser));
 
-        return boardJPARepo.save(reqDTO.toEntity(sessionUser));
+        return new BoardResponse.Save(board);
     }
 
     //글수정

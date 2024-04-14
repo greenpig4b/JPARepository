@@ -7,6 +7,7 @@ import shop.mtcoding.blog._core.errors.exception.Exception403;
 import shop.mtcoding.blog._core.errors.exception.Exception404;
 import shop.mtcoding.blog.board.Board;
 import shop.mtcoding.blog.board.BoardJPARepository;
+import shop.mtcoding.blog.board.BoardResponse;
 import shop.mtcoding.blog.user.User;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class ReplyService {
 
     //댓글쓰기
     @Transactional
-    public void write(ReplyRequest.SaveDTO reqDTO, User sessionUser){
+    public ReplyResponse.Save write(ReplyRequest.SaveDTO reqDTO, User sessionUser){
         // 인증
         Board board = boardJPARepo.findById(reqDTO.getBoardId())
                 .orElseThrow(() -> new Exception404("해당 게시글을 찾을 수 없습니다."));
@@ -27,20 +28,17 @@ public class ReplyService {
         // 작성
         Reply reply = reqDTO.toEntity(board,sessionUser);
 
-        replyJPARepo.save(reply);
+        Reply saveBoard = replyJPARepo.save(reply);
+
+        return new ReplyResponse.Save(saveBoard, board.getId());
     }
 
     //댓글삭제
     @Transactional
-    public void delete(Integer userId,Integer boardId,Integer replyId){
-        // 인증
-        Board board = boardJPARepo.findById(boardId)
-                .orElseThrow(() -> new Exception404("해당 게시글을 찾을 수 없습니다."));
+    public void delete(Integer userId,Integer replyId){
 
-        Reply reply = replyJPARepo.findByReplyId(board.getId(),replyId);
-
-        System.out.println("댓글유저 id"+reply.getUser().getId());
-        System.out.println("세션유저 id"+userId);
+        Reply reply = replyJPARepo.findById(replyId)
+                .orElseThrow(() -> new Exception404("해당 댓글을 찾을 수 없습니다"));
 
         // 권한
         if(reply.getUser().getId() != userId){

@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class BoardResponse {
 
-
+    //상세보기
     @Data
     public static class Detail{
         private Integer id;
@@ -55,6 +55,18 @@ public class BoardResponse {
                     }
                 }
             }
+        }
+    }
+
+
+    @Data
+    public static class Save{
+        private String title;
+        private String content;
+        @Builder
+        public Save(Board board) {
+            this.title = board.getTitle();
+            this.content = board.getContent();
         }
     }
 }

@@ -3,14 +3,13 @@ package shop.mtcoding.blog.board;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import shop.mtcoding.blog._core.errors.exception.Exception403;
 import shop.mtcoding.blog._core.errors.exception.Exception404;
+import shop.mtcoding.blog._core.util.ApiUtil;
 import shop.mtcoding.blog.user.User;
 
 import java.util.List;
@@ -21,12 +20,12 @@ public class BoardController {
     private final BoardService boardService;
     private final HttpSession session;
 
-    @PostMapping("/board/save")
-    public String write(BoardRequest.SaveDTO reqDTO) {
+    @PostMapping("/api/board")
+    public ResponseEntity<?> write(@RequestBody BoardRequest.SaveDTO reqDTO) {
         User sessionUser = (User) session.getAttribute("sessionUser");
-        boardService.write(reqDTO,sessionUser);
 
-        return "redirect:/";
+        BoardResponse.Save respDTO =  boardService.write(reqDTO,sessionUser);
+        return ResponseEntity.ok().body(new ApiUtil<>(respDTO));
     }
 
     @PostMapping("/board/{id}/update")
