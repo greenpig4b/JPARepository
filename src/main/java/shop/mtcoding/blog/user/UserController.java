@@ -9,10 +9,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import shop.mtcoding.blog._core.errors.exception.Exception400;
 import shop.mtcoding.blog._core.errors.exception.Exception401;
 import shop.mtcoding.blog._core.util.ApiUtil;
@@ -45,21 +42,23 @@ public class UserController {
                 .body(new ApiUtil<>(null));
     }
 
+    // 수정요청 폼
     @GetMapping("/api/update-form")
-    public String updateForm(HttpServletRequest request) {
+    public ResponseEntity<?> updateForm() {
         User sessionUser = (User) session.getAttribute("sessionUser");
-        User user = userService.updateForm(sessionUser.getId());
+        User respDTO = userService.updateForm(sessionUser.getId());
 
-        request.setAttribute("user", user);
-        return "user/update-form";
+        return ResponseEntity.ok()
+                .body(new ApiUtil<>(respDTO));
     }
 
-    @PostMapping("/user/update")
-    public String update(UserRequest.UpdateDTO reqDTO) {
+    @PutMapping("/api/update")
+    public ResponseEntity<?> update(@RequestBody UserRequest.UpdateDTO reqDTO) {
         User sessionUser = (User) session.getAttribute("sessionUser");
-        User newSessionUser = userRepository.updateById(sessionUser.getId(), reqDTO.getPassword(), reqDTO.getEmail());
-        session.setAttribute("sessionUser", newSessionUser);
-        return "redirect:/";
+        UserResponse.userUpdate respDTO = userService.update(sessionUser.getId(),reqDTO);
+
+       return ResponseEntity.ok()
+               .body(new ApiUtil<>(respDTO));
     }
 
 }

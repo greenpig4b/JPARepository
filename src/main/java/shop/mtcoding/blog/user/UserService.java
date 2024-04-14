@@ -4,7 +4,10 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import shop.mtcoding.blog._core.errors.exception.Exception401;
+import shop.mtcoding.blog._core.errors.exception.Exception403;
 import shop.mtcoding.blog._core.errors.exception.Exception404;
+import shop.mtcoding.blog.board.Board;
 
 @RequiredArgsConstructor
 @Service
@@ -35,5 +38,16 @@ public class UserService {
                 .orElseThrow(() -> new Exception404("해당정보를 찾을 수 없습니다."));
 
         return sessionUser;
+    }
+
+    //회원수정
+    public UserResponse.userUpdate update(Integer userId ,UserRequest.UpdateDTO reqDTO){
+        // 1. 조회
+        User user  = userJPARepo.findById(userId)
+                .orElseThrow(() -> new Exception401("로그인을 하셔야합니다"));
+        // 2. 수정
+        user.updateUser(reqDTO);
+
+        return new UserResponse.userUpdate(user);
     }
 }
