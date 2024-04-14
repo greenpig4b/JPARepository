@@ -3,73 +3,72 @@ package shop.mtcoding.blog.board;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import shop.mtcoding.blog._core.errors.exception.Exception403;
 import shop.mtcoding.blog._core.errors.exception.Exception404;
+import shop.mtcoding.blog._core.util.ApiUtil;
 import shop.mtcoding.blog.user.User;
 
 import java.util.List;
 
 @RequiredArgsConstructor // final이 붙은 친구들의 생성자를 만들어줘
-@Controller // new BoardController(IoC에서 BoardRepository를 찾아서 주입) -> IoC 컨테이너 등록
+@RestController // new BoardController(IoC에서 BoardRepository를 찾아서 주입) -> IoC 컨테이너 등록
 public class BoardController {
-    private final BoardJPARepository boardJPARepo;
     private final BoardService boardService;
-    private final BoardRepository boardRepository;
     private final HttpSession session;
 
-    @PostMapping("/board/save")
-    public String write(BoardRequest.SaveDTO reqDTO) {
+    @PostMapping("/api/board")
+    public ResponseEntity<?> write(@RequestBody BoardRequest.SaveDTO reqDTO) {
         User sessionUser = (User) session.getAttribute("sessionUser");
-        boardService.write(reqDTO,sessionUser);
+        BoardResponse.Save respDTO =  boardService.write(reqDTO,sessionUser);
 
-        return "redirect:/";
+        return ResponseEntity.ok().body(new ApiUtil<>(respDTO));
     }
 
-    @PostMapping("/board/{id}/update")
-    public String update(@PathVariable Integer id,BoardRequest.UpdateDTO reqDTO) {
+    @PutMapping("/api/{id}/board")
+    public ResponseEntity<?> update(@PathVariable Integer id,@RequestBody BoardRequest.UpdateDTO reqDTO) {
         User sessionUser = (User) session.getAttribute("sessionUser");
-        boardService.update(id,sessionUser.getId(),reqDTO);
+        BoardResponse.Update respDTO = boardService.update(id,sessionUser.getId(),reqDTO);
 
-        return "redirect:/board/"+id;
+        return ResponseEntity.ok().body(new ApiUtil<>(respDTO));
     }
 
-    @GetMapping("/board/{id}/update-form")
-    public String updateForm(@PathVariable Integer id, HttpServletRequest request) {
-        Board board = boardService.updateForm(id);
-        request.setAttribute("board", board);
-        return "board/update-form";
+    @GetMapping("/api/{id}/boards")
+    public ResponseEntity<?> updateForm(@PathVariable Integer id) {
+
+        BoardResponse.UpdateForm respDTO = boardService.updateForm(id);
+
+        return ResponseEntity.ok()
+                .body(new ApiUtil<>(respDTO));
     }
 
-    @PostMapping("/board/{id}/delete")
-    public String delete(@PathVariable Integer id) {
+    @DeleteMapping("/api/board/{id}")
+    public ResponseEntity<?> delete(@PathVariable Integer id) {
         User sessionUser = (User) session.getAttribute("sessionUser");
+
         boardService.delete(id,sessionUser.getId());
 
-        return "redirect:/";
+        return ResponseEntity.ok()
+                .body(new ApiUtil<>(null));
     }
 
     @GetMapping("/")
-    public String index(HttpServletRequest request) {
-        List<Board> boardList = boardService.findAll();
-        request.setAttribute("boardList", boardList);
-        return "index";
+    public ResponseEntity<?> index() {
+        List<BoardResponse.Main> respDTO = boardService.findAll();
+
+        return ResponseEntity.ok()
+                .body(new ApiUtil<>(respDTO));
     }
 
-    @GetMapping("/board/save-form")
-    public String saveForm() {
-        return "board/save-form";
-    }
-
-    @GetMapping("/board/{id}")
-    public String detail(@PathVariable Integer id, HttpServletRequest request) {
+    @GetMapping("/api/boards/{id}")
+    public ResponseEntity<?> detail(@PathVariable Integer id) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         BoardResponse.Detail respDTO = boardService.detail(id,sessionUser);
-        request.setAttribute("board", respDTO);
-        return "board/detail";
+
+       return  ResponseEntity.ok()
+               .body(new ApiUtil<>(respDTO));
     }
 }

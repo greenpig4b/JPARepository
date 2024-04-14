@@ -32,4 +32,10 @@ public class User {
         this.email = email;
         this.createdAt = createdAt;
     }
+
+    public void updateUser(UserRequest.UpdateDTO reqDTO){
+        this.password = reqDTO.getPassword();
+        this.email = reqDTO.getEmail();
+
+    }
 }

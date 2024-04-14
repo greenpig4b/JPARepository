@@ -6,28 +6,31 @@ import org.springframework.stereotype.Service;
 import shop.mtcoding.blog._core.errors.exception.Exception401;
 import shop.mtcoding.blog._core.errors.exception.Exception403;
 import shop.mtcoding.blog._core.errors.exception.Exception404;
+import shop.mtcoding.blog.reply.Reply;
+import shop.mtcoding.blog.reply.ReplyJPARepository;
 import shop.mtcoding.blog.user.User;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class BoardService {
 
     private final BoardJPARepository boardJPARepo;
-
+    private final ReplyJPARepository replyJPARepo;
 
     //글쓰기
     @Transactional
-    public Board write(BoardRequest.SaveDTO reqDTO, User sessionUser){
+    public BoardResponse.Save write(BoardRequest.SaveDTO reqDTO, User sessionUser){
+        Board board = boardJPARepo.save(reqDTO.toEntity(sessionUser));
 
-        return boardJPARepo.save(reqDTO.toEntity(sessionUser));
+        return new BoardResponse.Save(board);
     }
 
     //글수정
     @Transactional
-    public void update(Integer id ,Integer sessionUserId,BoardRequest.UpdateDTO reqDTO){
-
+    public BoardResponse.Update update(Integer id ,Integer sessionUserId,BoardRequest.UpdateDTO reqDTO){
         // 1. 조회
         Board board = boardJPARepo.findById(id)
                 .orElseThrow(() -> new Exception404("게시글을 찾을 수 없습니다"));
@@ -38,13 +41,15 @@ public class BoardService {
         // 3. 수정
         board.updateBoard(reqDTO);
 
+        return new BoardResponse.Update(board);
     }
 
     // 게시글 뿌리기
-    public List<Board> findAll(){
+    public List<BoardResponse.Main> findAll(){
         List<Board> boardList = boardJPARepo.findAll();
 
-        return boardList;
+       return boardList.stream().map(board ->
+                new BoardResponse.Main(board)).collect(Collectors.toList());
     }
 
     //게시글 삭제
@@ -65,17 +70,21 @@ public class BoardService {
     }
 
     // 게시글 상세보기
+    @Transactional
     public BoardResponse.Detail detail(Integer boardId,User sessionUser){
         // 1 권한
         Board board = boardJPARepo.findByBoardId(boardId);
-        return new BoardResponse.Detail(board,sessionUser);
+        List<Reply> replies = replyJPARepo.findAllByBoardId(boardId);
+
+        return new BoardResponse.Detail(board,sessionUser,replies);
 
     }
 
     // 게시글 업데이트폼
-    public Board updateForm(Integer boardId){
+    public BoardResponse.UpdateForm updateForm(Integer boardId){
         Board board = boardJPARepo.findByBoardId(boardId);
 
-        return  board;
+        return new BoardResponse.UpdateForm(board);
     }
+
 }
