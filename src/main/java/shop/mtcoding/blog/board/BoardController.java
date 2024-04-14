@@ -70,6 +70,7 @@ public class BoardController {
     public String detail(@PathVariable Integer id, HttpServletRequest request) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         BoardResponse.Detail respDTO = boardService.detail(id,sessionUser);
+        System.out.println(respDTO);
         request.setAttribute("board", respDTO);
 
         return "board/detail";

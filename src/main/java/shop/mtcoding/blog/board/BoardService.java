@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import shop.mtcoding.blog._core.errors.exception.Exception401;
 import shop.mtcoding.blog._core.errors.exception.Exception403;
 import shop.mtcoding.blog._core.errors.exception.Exception404;
+import shop.mtcoding.blog.reply.Reply;
+import shop.mtcoding.blog.reply.ReplyJPARepository;
 import shop.mtcoding.blog.user.User;
 
 import java.util.List;
@@ -15,7 +17,7 @@ import java.util.List;
 public class BoardService {
 
     private final BoardJPARepository boardJPARepo;
-
+    private final ReplyJPARepository replyJPARepo;
 
     //글쓰기
     @Transactional
@@ -68,7 +70,9 @@ public class BoardService {
     public BoardResponse.Detail detail(Integer boardId,User sessionUser){
         // 1 권한
         Board board = boardJPARepo.findByBoardId(boardId);
-        return new BoardResponse.Detail(board,sessionUser);
+        List<Reply> replies = replyJPARepo.findAllByBoardId(boardId);
+
+        return new BoardResponse.Detail(board,sessionUser,replies);
 
     }
 
