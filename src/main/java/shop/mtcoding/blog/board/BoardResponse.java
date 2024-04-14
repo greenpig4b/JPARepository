@@ -17,7 +17,7 @@ public class BoardResponse {
         private String title;
         private String content;
         private String username;
-        private boolean isOwner;
+        private String boardOwner = "글쓴이아님";
         private List<ReplyDTO> replys;
 
         @Builder
@@ -29,7 +29,7 @@ public class BoardResponse {
 
             if(sessionUser != null){
                 if (board.getUser().getId() == sessionUser.getId()){
-                    isOwner = true;
+                    boardOwner = "글쓴이맞음";
                 }
             }
 
@@ -43,7 +43,7 @@ public class BoardResponse {
             private Integer id;
             private String replyUser;
             private String replyComent;
-            private boolean replyOwner;
+            private String replyOwner = "댓글쓴사람아님";
 
             public ReplyDTO(Reply reply, User sessionUser) {
                 this.id = reply.getId();
@@ -51,7 +51,7 @@ public class BoardResponse {
                 this.replyComent = reply.getComment();
                 if (sessionUser != null){
                     if (reply.getUser().getUsername() == sessionUser.getUsername()){
-                        replyOwner = true;
+                        replyOwner = "댓글쓴사람 맞음";
                     }
                 }
             }
@@ -67,6 +67,39 @@ public class BoardResponse {
         public Save(Board board) {
             this.title = board.getTitle();
             this.content = board.getContent();
+        }
+    }
+
+    @Data
+    public static class Update{
+        private String title;
+        private String content;
+
+        public Update(Board board) {
+            this.title = board.getTitle();
+            this.content = board.getContent();
+        }
+    }
+
+    @Data
+    public static class UpdateForm{
+        private String title;
+        private String content;
+
+        public UpdateForm(Board board) {
+            this.title = board.getTitle();
+            this.content = board.getContent();
+        }
+    }
+
+    @Data
+    public static class Main{
+        private Integer id;
+        private String title;
+
+        public Main(Board board) {
+            this.id = board.getId();
+            this.title = board.getTitle();
         }
     }
 }

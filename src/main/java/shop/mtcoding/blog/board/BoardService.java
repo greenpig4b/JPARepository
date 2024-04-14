@@ -11,6 +11,7 @@ import shop.mtcoding.blog.reply.ReplyJPARepository;
 import shop.mtcoding.blog.user.User;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -29,8 +30,7 @@ public class BoardService {
 
     //글수정
     @Transactional
-    public void update(Integer id ,Integer sessionUserId,BoardRequest.UpdateDTO reqDTO){
-
+    public BoardResponse.Update update(Integer id ,Integer sessionUserId,BoardRequest.UpdateDTO reqDTO){
         // 1. 조회
         Board board = boardJPARepo.findById(id)
                 .orElseThrow(() -> new Exception404("게시글을 찾을 수 없습니다"));
@@ -41,13 +41,15 @@ public class BoardService {
         // 3. 수정
         board.updateBoard(reqDTO);
 
+        return new BoardResponse.Update(board);
     }
 
     // 게시글 뿌리기
-    public List<Board> findAll(){
+    public List<BoardResponse.Main> findAll(){
         List<Board> boardList = boardJPARepo.findAll();
 
-        return boardList;
+       return boardList.stream().map(board ->
+                new BoardResponse.Main(board)).collect(Collectors.toList());
     }
 
     //게시글 삭제
@@ -68,6 +70,7 @@ public class BoardService {
     }
 
     // 게시글 상세보기
+    @Transactional
     public BoardResponse.Detail detail(Integer boardId,User sessionUser){
         // 1 권한
         Board board = boardJPARepo.findByBoardId(boardId);
@@ -78,10 +81,10 @@ public class BoardService {
     }
 
     // 게시글 업데이트폼
-    public Board updateForm(Integer boardId){
+    public BoardResponse.UpdateForm updateForm(Integer boardId){
         Board board = boardJPARepo.findByBoardId(boardId);
 
-        return  board;
+        return new BoardResponse.UpdateForm(board);
     }
 
 }

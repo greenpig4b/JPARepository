@@ -23,56 +23,52 @@ public class BoardController {
     @PostMapping("/api/board")
     public ResponseEntity<?> write(@RequestBody BoardRequest.SaveDTO reqDTO) {
         User sessionUser = (User) session.getAttribute("sessionUser");
-
         BoardResponse.Save respDTO =  boardService.write(reqDTO,sessionUser);
+
         return ResponseEntity.ok().body(new ApiUtil<>(respDTO));
     }
 
-    @PostMapping("/board/{id}/update")
-    public String update(@PathVariable Integer id,BoardRequest.UpdateDTO reqDTO) {
+    @PutMapping("/api/{id}/board")
+    public ResponseEntity<?> update(@PathVariable Integer id,@RequestBody BoardRequest.UpdateDTO reqDTO) {
         User sessionUser = (User) session.getAttribute("sessionUser");
-        boardService.update(id,sessionUser.getId(),reqDTO);
+        BoardResponse.Update respDTO = boardService.update(id,sessionUser.getId(),reqDTO);
 
-        return "redirect:/board/"+id;
+        return ResponseEntity.ok().body(new ApiUtil<>(respDTO));
     }
 
-    @GetMapping("/board/{id}/update-form")
-    public String updateForm(@PathVariable Integer id, HttpServletRequest request) {
-        Board board = boardService.updateForm(id);
-        request.setAttribute("board", board);
+    @GetMapping("/api/{id}/boards")
+    public ResponseEntity<?> updateForm(@PathVariable Integer id) {
 
-        return "board/update-form";
+        BoardResponse.UpdateForm respDTO = boardService.updateForm(id);
+
+        return ResponseEntity.ok()
+                .body(new ApiUtil<>(respDTO));
     }
 
-    @PostMapping("/board/{id}/delete")
-    public String delete(@PathVariable Integer id) {
+    @DeleteMapping("/api/board/{id}")
+    public ResponseEntity<?> delete(@PathVariable Integer id) {
         User sessionUser = (User) session.getAttribute("sessionUser");
+
         boardService.delete(id,sessionUser.getId());
 
-        return "redirect:/";
+        return ResponseEntity.ok()
+                .body(new ApiUtil<>(null));
     }
 
     @GetMapping("/")
-    public String index(HttpServletRequest request) {
-        List<Board> boardList = boardService.findAll();
-        request.setAttribute("boardList", boardList);
+    public ResponseEntity<?> index() {
+        List<BoardResponse.Main> respDTO = boardService.findAll();
 
-        return "index";
+        return ResponseEntity.ok()
+                .body(new ApiUtil<>(respDTO));
     }
 
-    @GetMapping("/board/save-form")
-    public String saveForm() {
-
-        return "board/save-form";
-    }
-
-    @GetMapping("/board/{id}")
-    public String detail(@PathVariable Integer id, HttpServletRequest request) {
+    @GetMapping("/api/boards/{id}")
+    public ResponseEntity<?> detail(@PathVariable Integer id) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         BoardResponse.Detail respDTO = boardService.detail(id,sessionUser);
-        System.out.println(respDTO);
-        request.setAttribute("board", respDTO);
 
-        return "board/detail";
+       return  ResponseEntity.ok()
+               .body(new ApiUtil<>(respDTO));
     }
 }

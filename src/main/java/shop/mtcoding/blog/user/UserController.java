@@ -19,7 +19,6 @@ import shop.mtcoding.blog._core.util.ApiUtil;
 @RestController
 public class UserController {
     private final UserService userService;
-    private final UserRepository userRepository;
     private final HttpSession session;
 
     //회원가입
@@ -43,7 +42,7 @@ public class UserController {
     }
 
     // 수정요청 폼
-    @GetMapping("/api/update-form")
+    @GetMapping("/api/users")
     public ResponseEntity<?> updateForm() {
         User sessionUser = (User) session.getAttribute("sessionUser");
         User respDTO = userService.updateForm(sessionUser.getId());
