@@ -22,7 +22,7 @@ public class ReplyJPARepositoryTest {
         List<Reply> replyList = replyJPARepo.findAllByBoardId(boardId);
         //then
         System.out.println("결과값 ================" + replyList.size());
-        Assertions.assertThat(replyList.get(0).getUser().getUsername()).isEqualTo("ssar");
+        Assertions.assertThat(replyList.get(0).getUser().getUsername()).isEqualTo("cos");
     }
 
 }

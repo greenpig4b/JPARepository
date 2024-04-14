@@ -1,8 +1,22 @@
 package shop.mtcoding.blog.reply;
 
+import lombok.Data;
+import shop.mtcoding.blog.board.Board;
+import shop.mtcoding.blog.user.User;
+
 public class ReplyRequest {
 
-    public static class saveDTO{
+    @Data
+    public static class SaveDTO{
+        private Integer boardId;
+        private String comment;
 
+        public Reply toEntity(Board board,User sessionUser){
+            return Reply.builder()
+                    .comment(comment)
+                    .board(board)
+                    .user(sessionUser)
+                    .build();
+        }
     }
 }
