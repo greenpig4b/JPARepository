@@ -25,4 +25,16 @@ public class ReplyJPARepositoryTest {
         Assertions.assertThat(replyList.get(0).getUser().getUsername()).isEqualTo("cos");
     }
 
+    @Test
+    public void findByReplyId_test(){
+        //given
+        Integer replyId = 1;
+        Integer boardId = 4;
+        //when
+        Reply reply = replyJPARepo.findByReplyId(boardId,replyId);
+        //then
+        System.out.println("결과값 ================" + reply.getUser().getUsername());
+        Assertions.assertThat(reply.getUser().getUsername()).isEqualTo("ssar");
+    }
+
 }

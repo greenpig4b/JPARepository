@@ -40,11 +40,13 @@ public class BoardResponse {
         }
         @Data
         public static class ReplyDTO{
+            private Integer id;
             private String replyUser;
             private String replyComent;
             private boolean replyOwner;
 
             public ReplyDTO(Reply reply, User sessionUser) {
+                this.id = reply.getId();
                 this.replyUser = reply.getUser().getUsername();
                 this.replyComent = reply.getComment();
                 if (sessionUser != null){
