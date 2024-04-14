@@ -9,6 +9,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import shop.mtcoding.blog._core.errors.exception.Exception400;
 import shop.mtcoding.blog._core.errors.exception.Exception401;
@@ -23,7 +24,7 @@ public class UserController {
 
     //회원가입
     @PostMapping("/join")
-    public ResponseEntity<?> join(@RequestBody UserRequest.JoinDTO reqDTO) {
+    public ResponseEntity<?> join(@Valid @RequestBody UserRequest.JoinDTO reqDTO, Errors erros) {
         User sessionUser = userService.join(reqDTO);
         session.setAttribute("sessionUser",sessionUser);
 
@@ -34,10 +35,11 @@ public class UserController {
     //로그인
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserRequest.LoginDTO reqDTO) {
-        User sessionUser = userService.login(reqDTO);
-        session.setAttribute("sessionUser",sessionUser);
+
+        String jwt = userService.login(reqDTO);
 
         return  ResponseEntity.ok()
+                .header("Authorization", "Bearer " + jwt)
                 .body(new ApiUtil<>(null));
     }
 
@@ -54,7 +56,7 @@ public class UserController {
     @PutMapping("/api/update")
     public ResponseEntity<?> update(@RequestBody UserRequest.UpdateDTO reqDTO) {
         User sessionUser = (User) session.getAttribute("sessionUser");
-        UserResponse.userUpdate respDTO = userService.update(sessionUser.getId(),reqDTO);
+        UserResponse.userUpdate respDTO = userService.update(sessionUser.getId(), reqDTO);
 
        return ResponseEntity.ok()
                .body(new ApiUtil<>(respDTO));

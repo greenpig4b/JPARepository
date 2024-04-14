@@ -11,7 +11,7 @@ public class ReplyRequest {
         private Integer boardId;
         private String comment;
 
-        public Reply toEntity(Board board,User sessionUser){
+        public Reply toEntity(Board board, User sessionUser){
             return Reply.builder()
                     .comment(comment)
                     .board(board)

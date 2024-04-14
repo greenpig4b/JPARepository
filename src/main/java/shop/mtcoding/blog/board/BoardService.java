@@ -8,7 +8,10 @@ import shop.mtcoding.blog._core.errors.exception.Exception403;
 import shop.mtcoding.blog._core.errors.exception.Exception404;
 import shop.mtcoding.blog.reply.Reply;
 import shop.mtcoding.blog.reply.ReplyJPARepository;
+import shop.mtcoding.blog.user.SessionUser;
 import shop.mtcoding.blog.user.User;
+import shop.mtcoding.blog.user.UserJPARepository;
+import shop.mtcoding.blog.user.UserService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,11 +22,14 @@ public class BoardService {
 
     private final BoardJPARepository boardJPARepo;
     private final ReplyJPARepository replyJPARepo;
-
+    private final UserJPARepository userJPARepo;
+    private final UserService userService;
     //글쓰기
     @Transactional
-    public BoardResponse.Save write(BoardRequest.SaveDTO reqDTO, User sessionUser){
-        Board board = boardJPARepo.save(reqDTO.toEntity(sessionUser));
+    public BoardResponse.Save write(BoardRequest.SaveDTO reqDTO, SessionUser sessionUser){
+        User user  = userService.findById(sessionUser.getId());
+
+        Board board = boardJPARepo.save(reqDTO.toEntity(user));
 
         return new BoardResponse.Save(board);
     }
@@ -71,12 +77,13 @@ public class BoardService {
 
     // 게시글 상세보기
     @Transactional
-    public BoardResponse.Detail detail(Integer boardId,User sessionUser){
+    public BoardResponse.Detail detail(Integer boardId,SessionUser sessionUser){
         // 1 권한
         Board board = boardJPARepo.findByBoardId(boardId);
         List<Reply> replies = replyJPARepo.findAllByBoardId(boardId);
-
-        return new BoardResponse.Detail(board,sessionUser,replies);
+        User user = userJPARepo.findById(sessionUser.getId())
+                .orElseThrow(() -> new Exception404("해당 유저를 찾을 수 없습니다."));
+        return new BoardResponse.Detail(board,user,replies);
 
     }
 
